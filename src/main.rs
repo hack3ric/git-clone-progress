@@ -2,13 +2,20 @@ use indicatif::{ProgressBar, ProgressStyle};
 use regex::Regex;
 use std::io::{BufRead, BufReader};
 use std::process::{exit, Command, Stdio};
+use clap::Parser;
+
+#[derive(Parser)]
+struct Args {
+  /// The Git remote repository to clone.
+  url: String
+}
 
 fn main() -> anyhow::Result<()> {
   let re = Regex::new(r#"(.+):\s*(\d{1,3})%\s*\((\d+)/(\d+)\)(?:,\s*(.*?)\s*\|\s*(.*/s))?\s*"#)?;
-  let git_url = "https://github.com/Orange-OpenSource/hurl";
+  let args = Args::parse();
 
   let mut git = Command::new("git")
-    .args(["clone", "--progress", git_url])
+    .args(["clone", "--progress", &args.url])
     .env("LANG", "C")
     .stderr(Stdio::piped())
     .stdout(Stdio::piped())
